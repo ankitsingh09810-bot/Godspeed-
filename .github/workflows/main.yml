@@ -1,0 +1,37 @@
+name: Phoenix V100 Nitro Cluster
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' 
+  workflow_dispatch:
+
+jobs:
+  strike:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        machine_id: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+    
+    steps:
+      - name: 🔱 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔱 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 🔱 High-Speed Setup
+        run: |
+          pip install playwright playwright-stealth httpx
+          playwright install --with-deps chromium
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+
+      - name: 🔱 Ignition ${{ matrix.machine_id }}
+        env:
+          INSTA_COOKIE: ${{ secrets.INSTA_COOKIE }}
+          TARGET_THREAD_ID: ${{ secrets.TARGET_THREAD_ID }}
+          TARGET_NAME: ${{ secrets.TARGET_NAME }}
+          MACHINE_ID: ${{ matrix.machine_id }}
+        run: python main.py
