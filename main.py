@@ -79,7 +79,7 @@ async def run_strike(cookie, target_id, thread_idx, start_delay):
                     await page.keyboard.press("Enter")
                     
                     print(f"[T{thread_idx}] Block {i+1}/11 sent.")
-                    await asyncio.sleep(random.uniform(0.8, 1.2)) 
+                    await asyncio.sleep(random.uniform(0.1, 0.3)) 
                 
             except Exception as e:
                 print(f"[T{thread_idx}] Warning: {e}. Resetting...")
