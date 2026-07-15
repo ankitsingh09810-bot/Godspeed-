@@ -75,11 +75,11 @@ async def run_strike(cookie, target_id, thread_idx, start_delay):
                     
                     await page.focus(textbox_selector)
                     await page.keyboard.insert_text(text_to_send)
-                    await asyncio.sleep(0.3) 
+                    await asyncio.sleep(0.003) 
                     await page.keyboard.press("Enter")
                     
                     print(f"[T{thread_idx}] Block {i+1}/11 sent.")
-                    await asyncio.sleep(random.uniform(0.1, 0.3)) 
+                    await asyncio.sleep(random.uniform(0.3, 0.6)) 
                 
             except Exception as e:
                 print(f"[T{thread_idx}] Warning: {e}. Resetting...")
