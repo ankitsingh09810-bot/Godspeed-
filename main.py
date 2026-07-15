@@ -23,7 +23,6 @@ async def fast_human_behavior_reels(context, machine_id):
     """
     print(f"🎬 [Machine {machine_id}] Starting Quick Reels Simulation (Max ~20 Seconds)...")
     try:
-        # Naya temporary tab open karna
         reels_page = await context.new_page()
         # Media abort karna taaki load fast ho aur resources save hon
         await reels_page.route("**/*.{png,jpg,jpeg,gif,webp,svg,mp4,woff,woff2,ttf}", lambda route: route.abort())
@@ -37,24 +36,19 @@ async def fast_human_behavior_reels(context, machine_id):
         
         for current_reel in range(1, total_reels + 1):
             if current_reel in like_indices:
-                # Like karne wali reel par hold (1.5 to 2.5 sec)
                 await reels_page.wait_for_timeout(random.uniform(1500, 2500))
                 try:
-                    # Center screen par double click simulate karna reel like karne ke liye
                     await reels_page.mouse.dblclick(x=200, y=150)
                     print(f"❤️ [Machine {machine_id}] | Reel {current_reel}: Liked.")
                 except:
                     pass
                 await reels_page.wait_for_timeout(random.uniform(500, 1000))
             else:
-                # Normal scrolling reel par hold (0.5 to 1.2 sec)
                 await reels_page.wait_for_timeout(random.uniform(500, 1200))
             
-            # Simulated Keyboard event next reel par scroll karne ke liye
             await reels_page.keyboard.press("ArrowDown")
             await reels_page.wait_for_timeout(random.uniform(300, 600))
             
-        # Task poora hone par temporary tab close karna
         await reels_page.close()
         print(f"✅ [Machine {machine_id}] Reels Simulation Done. Temporary tab closed.")
     except Exception as e:
@@ -88,7 +82,7 @@ async def run_strike(node_id, cookie, target_id, target_name):
             'domain': '.instagram.com', 'path': '/', 'secure': True, 'httpOnly': True
         }])
 
-        # ⚡ PRIMARY INJECTION SCRIPT
+        # ⚡ OPTIMIZED GROUP CHAT INJECTION SCRIPT
         strike_script = """
             (name, delay) => {
                 const getBlock = () => {
@@ -104,7 +98,11 @@ async def run_strike(node_id, cookie, target_id, target_name):
                 }
 
                 const pulse = () => {
-                    const box = document.querySelector('div[role="textbox"], [contenteditable="true"]');
+                    // Optimized selectors for Group Chat input box
+                    const box = document.querySelector('div[role="textbox"]') || 
+                                document.querySelector('[contenteditable="true"]') ||
+                                document.querySelector('textarea');
+                                
                     if (box) {
                         const text = getBlock();
                         const dataTransfer = new DataTransfer();
@@ -118,17 +116,26 @@ async def run_strike(node_id, cookie, target_id, target_name):
                         
                         box.focus();
                         box.dispatchEvent(pasteEvent);
+                        
+                        // Multiple input events trigger karna taaki react component value save kar le
                         box.dispatchEvent(new Event('input', { bubbles: true }));
+                        box.dispatchEvent(new Event('change', { bubbles: true }));
                         
                         setTimeout(() => {
-                            const sendBtn = Array.from(document.querySelectorAll('div[role="button"], button')).find(el => 
-                                el.textContent === 'Send' || el.innerText === 'Send'
+                            // Selector for Send button (Text base aur Icon base dono generic checks)
+                            let sendBtn = Array.from(document.querySelectorAll('div[role="button"], button')).find(el => 
+                                el.textContent.trim() === 'Send' || el.innerText.trim() === 'Send'
                             );
+                            
+                            // Agar text selector fail ho jaye, to icons aur interactive direct parent structures ko dhoondna
+                            if (!sendBtn) {
+                                sendBtn = document.querySelector('div[aria-label="Send"]') || 
+                                          document.querySelector('form button[type="button"]') ||
+                                          document.querySelector('div[role="textbox"] ~ div[role="button"]');
+                            }
+                            
                             if (sendBtn) {
                                 sendBtn.click();
-                            } else {
-                                const fallbackBtn = document.querySelector('form button[type="button"], div[aria-label="Send"]');
-                                if (fallbackBtn) fallbackBtn.click();
                             }
                         }, 200);
                     }
@@ -140,7 +147,6 @@ async def run_strike(node_id, cookie, target_id, target_name):
 
         elapsed = 0
         last_reels_time = time.time()
-        # Reels activation interval dynamic rakhne ke liye random seconds generate karna (5 to 10 minutes)
         next_reels_interval = random.randint(300, 600)
 
         while elapsed < SESSION_MAX_SEC:
@@ -149,9 +155,7 @@ async def run_strike(node_id, cookie, target_id, target_name):
             # --- INTERACTION STATE CHECK ---
             current_time = time.time()
             if current_time - last_reels_time >= next_reels_interval:
-                # Har machine background me Reels simulation execute karegi
                 await fast_human_behavior_reels(context, node_id)
-                # Timers ko reset karna agle phase ke liye
                 last_reels_time = time.time()
                 next_reels_interval = random.randint(300, 600)
             
@@ -160,8 +164,12 @@ async def run_strike(node_id, cookie, target_id, target_name):
                 pg = await context.new_page()
                 await pg.route("**/*.{png,jpg,jpeg,gif,webp,svg,mp4,woff,woff2,ttf}", lambda route: route.abort())
                 try:
-                    # GitHub Environment variable se automated dynamic routing
+                    # Target id group thread id ko smoothly handle karegi
                     await pg.goto(f"https://www.instagram.com/direct/t/{target_id}/", wait_until="commit", timeout=15000)
+                    
+                    # Chat container ke load hone ka short check
+                    await pg.wait_for_timeout(3000) 
+                    
                     await pg.evaluate(strike_script, [target_name, PULSE_DELAY])
                     pages.append(pg)
                 except: 
@@ -185,4 +193,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-    
+        
